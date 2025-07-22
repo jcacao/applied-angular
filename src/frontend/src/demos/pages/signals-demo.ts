@@ -1,15 +1,17 @@
+import { JsonPipe } from '@angular/common';
 import {
   Component,
   ChangeDetectionStrategy,
   signal,
   computed,
   effect,
+  resource,
 } from '@angular/core';
 
 @Component({
   selector: 'app-demos-signals',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [],
+  imports: [JsonPipe],
   template: `
     <div>
       <p>Your Score: {{ score() }}</p>
@@ -31,24 +33,46 @@ import {
         >
           Reset
         </button>
+        <p>tick {{ tick() }}</p>
       </div>
     </div>
+
+    @if (todos.isLoading()) {
+      <p>We are loading</p>
+    } @else {
+      <p>You have {{ numberOfCompletedTodos() }}</p>
+      <pre>{{ todos.value() | json }}</pre>
+    }
   `,
   styles: ``,
 })
 export class SignalsDemo {
+  todos = resource<{ completed: boolean }[], unknown>({
+    loader: () =>
+      fetch('https://jsonplaceholder.typicode.com/todos').then((r) => r.json()),
+  });
+
+  numberOfCompletedTodos = computed(() => {
+    const todos = this.todos.value() || [];
+    return todos.filter((t) => t.completed === true).length;
+  });
   score = signal(0);
   par = signal(4);
+  tick = signal(0);
   underPar = computed(() => this.score() <= this.par());
   takeAShot() {
     this.score.update((s) => s + 1);
   }
   constructor() {
+    const intervalId = setInterval(() => this.tick.update((t) => t + 1), 1000);
+    effect((onCleanup) => {
+      onCleanup(() => {
+        console.log('blah' + intervalId);
+        clearInterval(intervalId);
+      });
+    });
     effect(() => {
-      const currentScore = this.score();
-      if (currentScore > 8) {
-        console.log('Get out of the golf course!!!');
-      }
+      console.log(this.score());
     });
   }
 }

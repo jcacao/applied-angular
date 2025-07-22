@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Demos } from './demos';
-import { SignalsDemo } from './pages/signals-demo';
+
 export const DEMOS_ROUTES: Routes = [
   {
     path: '',
@@ -8,7 +8,8 @@ export const DEMOS_ROUTES: Routes = [
     children: [
       {
         path: 'signals',
-        component: SignalsDemo,
+        loadComponent: () =>
+          import('./pages/signals-demo').then((c) => c.SignalsDemo),
       },
     ],
   },
