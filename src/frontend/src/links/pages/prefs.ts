@@ -1,10 +1,11 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { LinksStore } from '../services/links-store';
+import { UserTagFilter } from '../components/user-tag-filter';
 
 @Component({
   selector: 'app-links-prefs',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [],
+  imports: [UserTagFilter],
   template: `
     <div>
       <p>Link Sorting Preferences</p>
@@ -25,6 +26,7 @@ import { LinksStore } from '../services/links-store';
         </button>
       </div>
     </div>
+    <app-links-user-tag-filter />
   `,
   styles: ``,
 })
